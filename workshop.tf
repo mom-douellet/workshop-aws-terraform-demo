@@ -124,6 +124,7 @@ EOF
 resource "aws_security_group" "workshop-webservers" {
   name   = "${var.workshop_id}-webservers"
   vpc_id = var.workshop_vpc_id
+  
   ingress {
     cidr_blocks = ["0.0.0.0/0"]
     protocol    = "tcp"
@@ -142,6 +143,14 @@ resource "aws_security_group" "workshop-webservers" {
     from_port   = "22"
     to_port     = "22"
   }
+  
+  egress {
+    cidr_blocks = ["0.0.0.0/0"]
+    protocol   = -1
+    from_port  = 0
+    to_port    = 0
+  }
+
   tags = local.project_tags
 }
 
