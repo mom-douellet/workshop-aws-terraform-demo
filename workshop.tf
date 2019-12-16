@@ -146,7 +146,7 @@ resource "aws_security_group" "workshop-webservers" {
 }
 
 resource "aws_security_group" "workshop-mysql" {
-  name   = "ssh-allow-admin"
+  name   = "${var.workshop_id}-mysql"
   vpc_id = var.workshop_vpc_id
   ingress {
     security_groups = [aws_security_group.workshop-webservers.id]
@@ -155,24 +155,6 @@ resource "aws_security_group" "workshop-mysql" {
     to_port     = "3306"
   }
   tags = local.project_tags
-}
-
-resource "aws_default_security_group" "workshop-vpc" {
-  vpc_id = var.workshop_vpc_id
-
-  ingress {
-    self      = true
-    protocol  = -1
-    from_port = 0
-    to_port   = 0
-  }
-
-  egress {
-    cidr_blocks = ["0.0.0.0/0"]
-    protocol   = -1
-    from_port  = 0
-    to_port    = 0
-  }
 }
 
 resource "aws_iam_role_policy" "workshop-s3-access" {
@@ -247,9 +229,9 @@ resource "aws_instance" "webserver" {
     ]
 
   vpc_security_group_ids = [
-    aws_security_group.workshop-webservers.id,
-    aws_default_security_group.workshop-vpc.id
+    aws_security_group.workshop-webservers.id
   ]
+
   count = 1
   tags  = merge(map("Name", "${var.workshop_id}-webserver"), local.project_tags)
   iam_instance_profile = aws_iam_instance_profile.workshop-webserver.name
